@@ -56,11 +56,17 @@ export default class HPTrackerPlugin extends Plugin {
 	}
 
 	createAdjustmentButtons(container: HTMLElement, hpData: HPTrackerData) {
-		const createButton = (text: string, amount: number, type: 'currentHP' | 'tempHP' = 'currentHP') => {
+		const createButton = (text: string,
+			amount: number,
+			type: 'currentHP' | 'tempHP' = 'currentHP') => {
 			const button = container.createEl('button', { text });
 			button.onclick = () => {
 				if (type === 'currentHP') {
-					hpData.currentHP = Math.min(hpData.maxHP, hpData.currentHP + amount);
+					hpData.currentHP =
+						Math.min(hpData.maxHP, hpData.currentHP + amount);
+					if (hpData.currentHP < 0) {
+						hpData.currentHP = 0;
+					}
 				} else if (type === 'tempHP') {
 					hpData.tempHP = Math.max(0, hpData.tempHP + amount);
 				}
