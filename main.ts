@@ -16,7 +16,6 @@ export default class HPTrackerPlugin extends Plugin {
 
 	async onload() {
 		this.registerMarkdownCodeBlockProcessor("hp-tracker", (source, el, ctx) => {
-			console.log("Markdown Post Processor Triggered");
 			// Parse and store the values in memory
 			this.hpData = this.parseSource(source);
 			this.renderHPTracker(el);
@@ -40,7 +39,6 @@ export default class HPTrackerPlugin extends Plugin {
 			}
 		});
 
-		console.log('Parsed values:', values); // Debugging line
 		return values;
 	}
 
@@ -96,7 +94,7 @@ export default class HPTrackerPlugin extends Plugin {
 
 		const percentageDiv = hpDiv.createDiv({ cls: 'hp-percentage' });
 		percentageDiv.createEl('span', { text: `Current HP: ${currentHPEfficiency}%` });
-		percentageDiv.createEl('span', { text: ` | Temporary HP: ${tempHPEfficiency}%` });
+		percentageDiv.createEl('span', { text: ` | Temporary HP: ${tempHPEfficiency}%`, cls: `hp-temp-text` });
 
 		// Add a visual HP bar
 		const progressBar = hpDiv.createDiv({ cls: 'hp-progress-bar' });
@@ -132,16 +130,24 @@ export default class HPTrackerPlugin extends Plugin {
 
 	// Define a method to get the CSS class based on the percentage of HP
 	getHPBarClass(percentage: number): string {
-		if (percentage > 80) {
-			return 'hp-very-high'; // Class for very high HP
-		} else if (percentage > 65) {
-			return 'hp-high'; // Class for high HP
+		if (percentage > 90) {
+			return 'hp-full-hp';
+		} else if (percentage > 80) {
+			return 'hp-very-healthy';
+		} else if (percentage > 70) {
+			return 'hp-healthy';
+		} else if (percentage > 60) {
+			return 'hp-moderate';
+		} else if (percentage > 50) {
+			return 'hp-medium-low';
 		} else if (percentage > 40) {
-			return 'hp-medium-high'; // Class for medium-high HP
+			return 'hp-medium-low';
+		} else if (percentage > 30) {
+			return 'hp-low';
 		} else if (percentage > 20) {
-			return 'hp-medium-low'; // Class for medium-low HP
+			return 'hp-very-low ';
 		} else {
-			return 'hp-low'; // Class for low HP
+			return 'hp-critical';
 		}
 	}
 }
