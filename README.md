@@ -48,7 +48,7 @@ Adjusting HP
 ## Visual Demonstration
 
 
-![](https://github.com/FioPio/hp-tracker/res/hp-tracker-opt-2.gif)
+![](res/hp-tracker-opt-2.gif)
 
 
 ## Disclaimer
