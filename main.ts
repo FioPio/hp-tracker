@@ -37,7 +37,7 @@ export default class HPTrackerPlugin extends Plugin {
 	}
 
 	renderHPTracker(container: HTMLElement, hpData: HPTrackerData) {
-		// Clear previous content
+		// Clear the container completely
 		container.empty();
 
 		// Create a new div to hold the tracker
@@ -47,8 +47,12 @@ export default class HPTrackerPlugin extends Plugin {
 		hpDiv.createEl('p', { text: `Current HP: ${hpData.currentHP}` });
 		hpDiv.createEl('p', { text: `Temporary HP: ${hpData.tempHP}` });
 
+		// Create buttons container for the adjustment buttons
 		const buttonsContainer = hpDiv.createDiv({ cls: 'hp-buttons' });
 		this.createAdjustmentButtons(buttonsContainer, hpData);
+
+		// Replace the original block with the new content
+		container.replaceWith(hpDiv); // Replace the original block
 	}
 
 	createAdjustmentButtons(container: HTMLElement, hpData: HPTrackerData) {
@@ -60,7 +64,7 @@ export default class HPTrackerPlugin extends Plugin {
 				} else if (type === 'tempHP') {
 					hpData.tempHP = Math.max(0, hpData.tempHP + amount);
 				}
-				this.updateHPDisplay(container, hpData);
+				this.updateHPDisplay(hpData); // Update the display with new HP data
 			};
 		};
 
@@ -71,14 +75,19 @@ export default class HPTrackerPlugin extends Plugin {
 		createButton('Remove 1 Temp HP', -1, 'tempHP');
 	}
 
-	updateHPDisplay(container: HTMLElement, hpData: HPTrackerData) {
-		// Clear existing buttons and text
-		container.empty();
-		container.createEl('p', { text: `Max HP: ${hpData.maxHP}` });
-		container.createEl('p', { text: `Current HP: ${hpData.currentHP}` });
-		container.createEl('p', { text: `Temporary HP: ${hpData.tempHP}` });
+	updateHPDisplay(hpData: HPTrackerData) {
+		// Find the current tracker container
+		const container = document.querySelector('.hp-tracker-container');
+		if (container) {
+			container.empty(); // Clear existing text
+			container.createEl('h2', { text: 'HP Tracker' });
+			container.createEl('p', { text: `Max HP: ${hpData.maxHP}` });
+			container.createEl('p', { text: `Current HP: ${hpData.currentHP}` });
+			container.createEl('p', { text: `Temporary HP: ${hpData.tempHP}` });
 
-		const buttonsContainer = container.createDiv({ cls: 'hp-buttons' });
-		this.createAdjustmentButtons(buttonsContainer, hpData);
+			// Recreate the button container
+			const buttonsContainer = container.createDiv({ cls: 'hp-buttons' });
+			this.createAdjustmentButtons(buttonsContainer, hpData);
+		}
 	}
 }
