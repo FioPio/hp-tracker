@@ -49,13 +49,22 @@ export default class HPTrackerPlugin extends Plugin {
 		button.onclick = () => {
 			console.log('Before adjustment:', this.hpData); // Debugging line
 
-			// Adjust the values directly in the memory (this.hpData)
-			if (type === 'currentHP') {
-				this.hpData.currentHP += amount;
-				// Clamp currentHP between 0 and maxHP
-				this.hpData.currentHP = Math.max(0, Math.min(this.hpData.currentHP, this.hpData.maxHP));
-			} else if (type === 'tempHP') {
-				this.hpData.tempHP = Math.max(0, this.hpData.tempHP + amount);
+			if (amount < 0) {
+				if (this.hpData.tempHP > 0) {
+					this.hpData.tempHP += amount; // Decrease temporary HP if available
+				} else {
+					this.hpData.currentHP += amount; // Otherwise, decrease current HP
+					// Clamp currentHP between 0 and maxHP
+					this.hpData.currentHP = Math.max(0, Math.min(this.hpData.currentHP, this.hpData.maxHP));
+				}
+			} else {
+				// For positive adjustments, just increase the HP type specified
+				if (type === 'currentHP') {
+					this.hpData.currentHP += amount;
+					this.hpData.currentHP = Math.max(0, Math.min(this.hpData.currentHP, this.hpData.maxHP));
+				} else if (type === 'tempHP') {
+					this.hpData.tempHP += amount;
+				}
 			}
 
 			console.log('After adjustment:', this.hpData); // Debugging line
@@ -63,6 +72,23 @@ export default class HPTrackerPlugin extends Plugin {
 			// Re-render the tracker (reset the container content)
 			this.renderHPTracker(container.parentElement?.parentElement as HTMLElement);
 		};
+
+		// Style the button for better appearance
+		button.style.margin = '0 5px';
+		button.style.padding = '5px 10px';
+		button.style.borderRadius = '5px';
+		button.style.border = '1px solid #ccc';
+		button.style.cursor = 'pointer';
+		button.style.transition = 'background-color 0.3s ease';
+
+		// Change button color on hover
+		button.onmouseenter = () => {
+			button.style.backgroundColor = '#e0e0e0';
+		};
+		button.onmouseleave = () => {
+			button.style.backgroundColor = '';
+		};
+
 		container.appendChild(button);
 	}
 
@@ -84,8 +110,8 @@ export default class HPTrackerPlugin extends Plugin {
 		const progress = progressBar.createDiv({ cls: 'hp-progress' });
 		progress.style.width = `${currentHPEfficiency}%`;
 
-		// Set the background color based on the HP percentage
-		progress.style.backgroundColor = this.getHPBarColor(Number(currentHPEfficiency));
+		// Set the data attribute for CSS to handle color
+		progress.setAttr('data-hp-percentage', currentHPEfficiency);
 
 		// Create a div for Current HP
 		const currentHPDiv = hpDiv.createDiv({ cls: 'hp-tracker-line' });
@@ -121,5 +147,4 @@ export default class HPTrackerPlugin extends Plugin {
 			return '#f44336'; // Red for low HP
 		}
 	}
-
 }
