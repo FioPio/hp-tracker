@@ -46,8 +46,8 @@ export default class HPTrackerPlugin extends Plugin {
 
 	createAdjustmentButtons(container: HTMLElement, amount: number, type: 'currentHP' | 'tempHP') {
 		const button = container.createEl('button', { text: amount > 0 ? '+' : '-' });
+		button.classList.add('hp-tracker-button'); // Add the new class
 		button.onclick = () => {
-			console.log('Before adjustment:', this.hpData); // Debugging line
 
 			if (amount < 0) { // Only handle decreases
 				if (this.hpData.tempHP > 0) {
@@ -74,28 +74,9 @@ export default class HPTrackerPlugin extends Plugin {
 				}
 			}
 
-			console.log('After adjustment:', this.hpData); // Debugging line
-
 			// Re-render the tracker (reset the container content)
 			this.renderHPTracker(container.parentElement?.parentElement as HTMLElement);
 		};
-
-		// Style the button for better appearance
-		button.style.margin = '0 5px';
-		button.style.padding = '5px 10px';
-		button.style.borderRadius = '5px';
-		button.style.border = '1px solid #ccc';
-		button.style.cursor = 'pointer';
-		button.style.transition = 'background-color 0.3s ease';
-
-		// Change button color on hover
-		button.onmouseenter = () => {
-			button.style.backgroundColor = '#e0e0e0';
-		};
-		button.onmouseleave = () => {
-			button.style.backgroundColor = '';
-		};
-
 		container.appendChild(button);
 	}
 
@@ -106,7 +87,7 @@ export default class HPTrackerPlugin extends Plugin {
 
 		// Create a new div to hold the tracker
 		const hpDiv = container.createDiv({ cls: 'hp-tracker-container' });
-		hpDiv.createEl('h2', { text: 'HP Tracker', attr: { style: 'color: #ff4500;' } });
+		hpDiv.createEl('h2', { text: 'HP Tracker', cls: 'hp-tracker-header' });
 
 		// Calculate percentage HP
 		const currentHPEfficiency = ((this.hpData.currentHP / this.hpData.maxHP) * 100).toFixed(1);
@@ -121,14 +102,12 @@ export default class HPTrackerPlugin extends Plugin {
 		const progressBar = hpDiv.createDiv({ cls: 'hp-progress-bar' });
 
 		// Create a combined progress div for Current HP
-		const currentProgress = progressBar.createDiv({ cls: 'hp-progress current' });
-		currentProgress.style.width = `${currentHPEfficiency}%`;
-		currentProgress.style.backgroundColor = this.getHPBarColor(Number(currentHPEfficiency));
+		const currentProgress = progressBar.createDiv({ cls: `hp-progress current ${this.getHPBarClass(Number(currentHPEfficiency))}` });
+		currentProgress.style.width = `${currentHPEfficiency}%`; // Set width inline since it's dynamic
 
 		// Create a div for Temporary HP that sits next to Current HP
-		const tempProgress = progressBar.createDiv({ cls: 'hp-progress temp' });
-		tempProgress.style.width = `${tempHPEfficiency}%`;
-		tempProgress.style.backgroundColor = 'purple'; // Temporary HP bar color
+		const tempProgress = progressBar.createDiv({ cls: `hp-progress temp` });
+		tempProgress.style.width = `${tempHPEfficiency}%`; // Set width inline since it's dynamic
 
 		// Create a div for Current HP adjustments
 		const currentHPDiv = hpDiv.createDiv({ cls: 'hp-tracker-line' });
@@ -151,19 +130,18 @@ export default class HPTrackerPlugin extends Plugin {
 		container.appendChild(hpDiv);
 	}
 
-
-
-
-	// Define a method to get the color based on the percentage of HP
-	getHPBarColor(percentage: number): string {
-		if (percentage > 75) {
-			return '#4caf50'; // Green for high HP
-		} else if (percentage > 50) {
-			return '#ffc107'; // Yellow for medium-high HP
-		} else if (percentage > 25) {
-			return '#ff9800'; // Orange for medium-low HP
+	// Define a method to get the CSS class based on the percentage of HP
+	getHPBarClass(percentage: number): string {
+		if (percentage > 80) {
+			return 'hp-very-high'; // Class for very high HP
+		} else if (percentage > 65) {
+			return 'hp-high'; // Class for high HP
+		} else if (percentage > 40) {
+			return 'hp-medium-high'; // Class for medium-high HP
+		} else if (percentage > 20) {
+			return 'hp-medium-low'; // Class for medium-low HP
 		} else {
-			return '#f44336'; // Red for low HP
+			return 'hp-low'; // Class for low HP
 		}
 	}
 }

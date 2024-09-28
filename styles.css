@@ -1,3 +1,8 @@
+.hp-tracker-header {
+    color: #ff4500;
+    /* Header color for the HP Tracker */
+}
+
 .hp-tracker-container {
     font-family: Arial, sans-serif;
     padding: 15px;
@@ -82,14 +87,54 @@ button:disabled {
     transition: width 0.3s ease;
 }
 
-.hp-progress.current {
-    background-color: #4caf50;
-    /* Color for current HP */
-}
-
 
 .hp-progress.temp {
     background-color: purple;
     /* Temporary HP bar color */
+}
 
+
+.hp-tracker-button {
+    margin: 0 3px;
+    /* Adjust margin to be closer */
+    padding: 5px 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+/* Optional: Button hover styles */
+.hp-tracker-button:hover {
+    background-color: #e0e0e0;
+}
+
+.hp-tracker-button:active {
+    background-color: #004085;
+}
+
+
+.hp-very-high {
+    background-color: #4caf50;
+    /* Green for very high HP */
+}
+
+.hp-high {
+    background-color: #8bc34a;
+    /* Lighter green for high HP */
+}
+
+.hp-medium-high {
+    background-color: #ffc107;
+    /* Yellow for medium-high HP */
+}
+
+.hp-medium-low {
+    background-color: #ff9800;
+    /* Orange for medium-low HP */
+}
+
+.hp-low {
+    background-color: #f44336;
+    /* Red for low HP */
 }
