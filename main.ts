@@ -44,22 +44,31 @@ export default class HPTrackerPlugin extends Plugin {
 		return values;
 	}
 
-	createAdjustmentButtons(container: HTMLElement, amount: number) {
+	createAdjustmentButtons(container: HTMLElement, amount: number, type: 'currentHP' | 'tempHP') {
 		const button = container.createEl('button', { text: amount > 0 ? '+' : '-' });
 		button.onclick = () => {
 			console.log('Before adjustment:', this.hpData); // Debugging line
 
-			if (amount < 0) {
+			if (amount < 0) { // Only handle decreases
 				if (this.hpData.tempHP > 0) {
-					this.hpData.tempHP += amount; // Decrease temporary HP if available
+					// If there are temporary HP, decrease them first
+					this.hpData.tempHP += amount; // Decrease temporary HP
+					if (this.hpData.tempHP < 0) {
+						// If temp HP goes below zero, adjust current HP
+						this.hpData.currentHP += this.hpData.tempHP; // tempHP is negative here, effectively reducing currentHP
+						this.hpData.tempHP = 0; // Reset temp HP to zero
+					}
 				} else {
-					this.hpData.currentHP += amount; // Otherwise, decrease current HP
+					// No temporary HP, decrease current HP
+					this.hpData.currentHP += amount; // Decrease current HP
 					// Clamp currentHP between 0 and maxHP
 					this.hpData.currentHP = Math.max(0, Math.min(this.hpData.currentHP, this.hpData.maxHP));
 				}
 			} else {
-				// For positive adjustments, just increase the HP
-				if (this.hpData.currentHP < this.hpData.maxHP) {
+				// For positive adjustments
+				if (type === 'tempHP') {
+					this.hpData.tempHP += amount; // Increase temporary HP
+				} else if (this.hpData.currentHP < this.hpData.maxHP) {
 					this.hpData.currentHP += amount; // Increase current HP
 					this.hpData.currentHP = Math.min(this.hpData.currentHP, this.hpData.maxHP); // Clamp to maxHP
 				}
@@ -90,47 +99,59 @@ export default class HPTrackerPlugin extends Plugin {
 		container.appendChild(button);
 	}
 
+
 	renderHPTracker(container: HTMLElement) {
 		// Clear the container completely before rendering the tracker again
 		container.empty();
 
 		// Create a new div to hold the tracker
 		const hpDiv = container.createDiv({ cls: 'hp-tracker-container' });
-		hpDiv.createEl('h2', { text: 'HP Tracker', attr: { style: 'color: #ff4500;' } }); // Change the font color
+		hpDiv.createEl('h2', { text: 'HP Tracker', attr: { style: 'color: #ff4500;' } });
 
 		// Calculate percentage HP
 		const currentHPEfficiency = ((this.hpData.currentHP / this.hpData.maxHP) * 100).toFixed(1);
+		const tempHPEfficiency = ((this.hpData.tempHP / this.hpData.maxHP) * 100).toFixed(1);
+		const totalHPEfficiency = Math.min(100, ((this.hpData.currentHP + this.hpData.tempHP) / this.hpData.maxHP) * 100).toFixed(1);
+
 		const percentageDiv = hpDiv.createDiv({ cls: 'hp-percentage' });
-		percentageDiv.createEl('span', { text: `HP: ${currentHPEfficiency}%` });
+		percentageDiv.createEl('span', { text: `Current HP: ${currentHPEfficiency}%` });
+		percentageDiv.createEl('span', { text: ` | Temporary HP: ${tempHPEfficiency}%` });
 
 		// Add a visual HP bar
 		const progressBar = hpDiv.createDiv({ cls: 'hp-progress-bar' });
-		const progress = progressBar.createDiv({ cls: 'hp-progress' });
-		progress.style.width = `${currentHPEfficiency}%`;
 
-		// Set the background color based on the HP percentage
-		progress.style.backgroundColor = this.getHPBarColor(Number(currentHPEfficiency));
+		// Create a combined progress div for Current HP
+		const currentProgress = progressBar.createDiv({ cls: 'hp-progress current' });
+		currentProgress.style.width = `${currentHPEfficiency}%`;
+		currentProgress.style.backgroundColor = this.getHPBarColor(Number(currentHPEfficiency));
 
-		// Create a div for Current HP
+		// Create a div for Temporary HP that sits next to Current HP
+		const tempProgress = progressBar.createDiv({ cls: 'hp-progress temp' });
+		tempProgress.style.width = `${tempHPEfficiency}%`;
+		tempProgress.style.backgroundColor = 'purple'; // Temporary HP bar color
+
+		// Create a div for Current HP adjustments
 		const currentHPDiv = hpDiv.createDiv({ cls: 'hp-tracker-line' });
 		currentHPDiv.createEl('span', { text: 'Current HP:' });
 
-		// Create a single button for adjustments
-		this.createAdjustmentButtons(currentHPDiv, -1); // Decrease HP (temporary or current)
+		// Create buttons for Current HP adjustments
+		this.createAdjustmentButtons(currentHPDiv, -1, 'currentHP'); // Decrease current HP
 		currentHPDiv.createEl('span', { text: ` ${this.hpData.currentHP} / ${this.hpData.maxHP}` });
-		this.createAdjustmentButtons(currentHPDiv, 1); // Increase current HP
+		this.createAdjustmentButtons(currentHPDiv, 1, 'currentHP'); // Increase current HP
 
-		// Create a div for Temporary HP
+		// Create a div for Temporary HP adjustments
 		const tempHPDiv = hpDiv.createDiv({ cls: 'hp-tracker-line' });
 		tempHPDiv.createEl('span', { text: 'Temporary HP:' });
+		tempHPDiv.createEl('span', { text: ` ${this.hpData.tempHP}` }); // Display temporary HP value
 
-		// Display temporary HP value
-		tempHPDiv.createEl('span', { text: ` ${this.hpData.tempHP}` });
-		// No buttons for temp HP here since we merged the functionality
+		// Move the button for Temporary HP adjustments to the right
+		this.createAdjustmentButtons(tempHPDiv, 1, 'tempHP'); // Increase temp HP
 
 		// Append the HP tracker div to the container
 		container.appendChild(hpDiv);
 	}
+
+
 
 
 	// Define a method to get the color based on the percentage of HP
