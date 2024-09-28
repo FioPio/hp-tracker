@@ -48,7 +48,7 @@ Adjusting HP
 ## Visual Demonstration
 
 
-![](res/hp-tracker.GIF)
+![](res/hp-tracker-opt-2.gif)
 
 
 ## Disclaimer
