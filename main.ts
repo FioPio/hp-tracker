@@ -84,6 +84,9 @@ export default class HPTrackerPlugin extends Plugin {
 		const progress = progressBar.createDiv({ cls: 'hp-progress' });
 		progress.style.width = `${currentHPEfficiency}%`;
 
+		// Set the background color based on the HP percentage
+		progress.style.backgroundColor = this.getHPBarColor(Number(currentHPEfficiency));
+
 		// Create a div for Current HP
 		const currentHPDiv = hpDiv.createDiv({ cls: 'hp-tracker-line' });
 		currentHPDiv.createEl('span', { text: 'Current HP:' });
@@ -105,4 +108,18 @@ export default class HPTrackerPlugin extends Plugin {
 		// Append the HP tracker div to the container
 		container.appendChild(hpDiv);
 	}
+
+	// Define a method to get the color based on the percentage of HP
+	getHPBarColor(percentage: number): string {
+		if (percentage > 75) {
+			return '#4caf50'; // Green for high HP
+		} else if (percentage > 50) {
+			return '#ffc107'; // Yellow for medium-high HP
+		} else if (percentage > 25) {
+			return '#ff9800'; // Orange for medium-low HP
+		} else {
+			return '#f44336'; // Red for low HP
+		}
+	}
+
 }
