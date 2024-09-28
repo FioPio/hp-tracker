@@ -19,7 +19,7 @@ export default class HPTrackerPlugin extends Plugin {
 			console.log("Markdown Post Processor Triggered");
 			// Parse and store the values in memory
 			this.hpData = this.parseSource(source);
-			this.renderHPTracker(el, this.hpData);
+			this.renderHPTracker(el);
 		});
 	}
 
@@ -59,18 +59,30 @@ export default class HPTrackerPlugin extends Plugin {
 			}
 
 			console.log('After adjustment:', this.hpData); // Debugging line
-			this.updateHPDisplay(container, this.hpData);
+
+			// Re-render the tracker (reset the container content)
+			this.renderHPTracker(container.parentElement?.parentElement as HTMLElement);
 		};
 		container.appendChild(button);
 	}
 
-	renderHPTracker(container: HTMLElement, hpData: HPTrackerData) {
-		// Clear the container completely
+	renderHPTracker(container: HTMLElement) {
+		// Clear the container completely before rendering the tracker again
 		container.empty();
 
 		// Create a new div to hold the tracker
 		const hpDiv = container.createDiv({ cls: 'hp-tracker-container' });
 		hpDiv.createEl('h2', { text: 'HP Tracker', attr: { style: 'color: #ff4500;' } }); // Change the font color
+
+		// Calculate percentage HP
+		const currentHPEfficiency = ((this.hpData.currentHP / this.hpData.maxHP) * 100).toFixed(1);
+		const percentageDiv = hpDiv.createDiv({ cls: 'hp-percentage' });
+		percentageDiv.createEl('span', { text: `HP: ${currentHPEfficiency}%` });
+
+		// Add a visual HP bar
+		const progressBar = hpDiv.createDiv({ cls: 'hp-progress-bar' });
+		const progress = progressBar.createDiv({ cls: 'hp-progress' });
+		progress.style.width = `${currentHPEfficiency}%`;
 
 		// Create a div for Current HP
 		const currentHPDiv = hpDiv.createDiv({ cls: 'hp-tracker-line' });
@@ -78,9 +90,7 @@ export default class HPTrackerPlugin extends Plugin {
 
 		// Create buttons for Current HP adjustments
 		this.createAdjustmentButtons(currentHPDiv, -1, 'currentHP'); // Decrease current HP
-		const currentHPValue = currentHPDiv.createEl('span', { text: ` ${hpData.currentHP} / ${hpData.maxHP}` });
-		const currentHPEfficiency = ((hpData.currentHP / hpData.maxHP) * 100).toFixed(1);
-		currentHPDiv.createEl('span', { text: ` (${currentHPEfficiency}%)` });
+		currentHPDiv.createEl('span', { text: ` ${this.hpData.currentHP} / ${this.hpData.maxHP}` });
 		this.createAdjustmentButtons(currentHPDiv, 1, 'currentHP'); // Increase current HP
 
 		// Create a div for Temporary HP
@@ -89,28 +99,10 @@ export default class HPTrackerPlugin extends Plugin {
 
 		// Create buttons for Temporary HP adjustments
 		this.createAdjustmentButtons(tempHPDiv, -1, 'tempHP'); // Decrease temp HP
-		tempHPDiv.createEl('span', { text: ` ${hpData.tempHP}` }); // Display temporary HP value
+		tempHPDiv.createEl('span', { text: ` ${this.hpData.tempHP}` }); // Display temporary HP value
 		this.createAdjustmentButtons(tempHPDiv, 1, 'tempHP'); // Increase temp HP
 
 		// Append the HP tracker div to the container
 		container.appendChild(hpDiv);
-	}
-
-	updateHPDisplay(container: HTMLElement, hpData: HPTrackerData) {
-		// Update the displayed values without duplicating the layout
-		const currentHPValue = container.querySelector('.hp-tracker-line:nth-of-type(1) span:nth-of-type(2)') as HTMLElement;
-		const currentHPEfficiency = ((hpData.currentHP / hpData.maxHP) * 100).toFixed(1);
-		if (currentHPValue) {
-			currentHPValue.textContent = `${hpData.currentHP} / ${hpData.maxHP}`;
-			const efficiencySpan = currentHPValue.nextElementSibling as HTMLElement;
-			if (efficiencySpan) {
-				efficiencySpan.textContent = ` (${currentHPEfficiency}%)`;
-			}
-		}
-
-		const tempHPValue = container.querySelector('.hp-tracker-line:last-of-type span:last-of-type') as HTMLElement;
-		if (tempHPValue) {
-			tempHPValue.textContent = `${hpData.tempHP}`;
-		}
 	}
 }

@@ -8,6 +8,30 @@
     margin-top: 10px;
 }
 
+.hp-percentage {
+    text-align: center;
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.hp-progress-bar {
+    width: 100%;
+    height: 15px;
+    background-color: #ddd;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    position: relative;
+}
+
+.hp-progress {
+    height: 100%;
+    background-color: #4caf50;
+    border-radius: 10px;
+    transition: width 0.3s ease;
+}
+
 .hp-tracker-line {
     display: flex;
     justify-content: space-between;
