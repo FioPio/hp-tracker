@@ -125,53 +125,53 @@ button:disabled {
 }
 
 
-/* HP Color progress */
+/* HP Color Progress */
 .hp-full-hp {
     background-color: #00ff00;
-    /* Green for very high HP */
+    /* Bright green for full HP */
 }
 
 .hp-very-healthy {
-    background-color: #33ff00;
-    /* Green for very high HP */
+    background-color: #66ff33;
+    /* Distinct green for very high HP */
 }
 
 .hp-healthy {
-    background-color: #66ff00;
-    /* Green for very high HP */
+    background-color: #99ff66;
+    /* Lighter green for healthy HP */
 }
 
 .hp-high {
-    background-color: #99ff00;
-    /* Lighter green for high HP */
+    background-color: #ccff99;
+    /* Even lighter green for high HP */
 }
 
 .hp-medium-high {
-    background-color: #ccff00;
+    background-color: #ffff66;
     /* Yellow for medium-high HP */
 }
 
 .hp-moderate {
-    background-color: #ffff00;
-    /* Yellow for medium-high HP */
+    background-color: #ffcc33;
+    /* Darker yellow for moderate HP */
 }
 
 .hp-medium-low {
-    background-color: #ffcc00;
-    /* Yellow for medium-high HP */
+    background-color: #ff9933;
+    /* Orange-yellow for medium-low HP */
 }
 
 .hp-low {
-    background-color: #ff9900;
-    /* Orange for medium-low HP */
+    background-color: #ff6600;
+    /* Bright orange for low HP */
 }
 
 .hp-very-low {
-    background-color: #ff4d00;
-    /* Orange for medium-low HP */
+    background-color: #ff3300;
+    /* Bright red-orange for very low HP */
 }
 
 .hp-critical {
-    background-color: #ff0000;
-    /* Red for low HP */
+    background-color: #990000;
+    /* Dark red for critical HP */
 }

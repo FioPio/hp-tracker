@@ -38,7 +38,6 @@ export default class HPTrackerPlugin extends Plugin {
 				else if (trimmedKey === 'temporary-hp') values.tempHP = parseInt(value.trim());
 			}
 		});
-
 		return values;
 	}
 
